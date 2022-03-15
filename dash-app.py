@@ -165,16 +165,16 @@ app.layout = html.Div(
                                         ),
                                         html.Br(),
                                         html.Label('Min time (ns)'),
-                                        dcc.Input(id = 'params_filt_min', value='-0.2', type='text'),
+                                        dcc.Input(id = 'params_filt_min', value=str(Tmin), type='text'),
                                         html.Br(),
                                         html.Label('Max time (ns)'),
-                                        dcc.Input(id = 'params_filt_max', value='2', type='text'),
+                                        dcc.Input(id = 'params_filt_max', value=str(Tmax), type='text'),
                                         html.Br(),
                                         html.Label('Min freq (GHz)'),
-                                        dcc.Input(id = 'params_filt_minfreq', value='20', type='text'),
+                                        dcc.Input(id = 'params_filt_minfreq', value=str(Freqmin), type='text'),
                                         html.Br(),
                                         html.Label('Max freq (GHz)'),
-                                        dcc.Input(id = 'params_filt_maxfreq', value='100', type='text'),
+                                        dcc.Input(id = 'params_filt_maxfreq', value=str(Freqmax), type='text'),
                                         ]),
                                         html.Div(
                                     className="one-third column omega",
@@ -183,20 +183,20 @@ app.layout = html.Div(
                                                 children=['FFT']),
 
                                         html.Label('nfft (2**n)'),
-                                        dcc.Input(id = 'params_fft_nfft', value='14', type='text'),
+                                        dcc.Input(id = 'params_fft_nfft', value=str(np.log2(nfft)), type='text'),
                                         html.Br(),
                                         html.Label('Max freq (GHz)'),
-                                        dcc.Input(id = 'params_fft_max', value='100', type='text'),
+                                        dcc.Input(id = 'params_fft_max', value=str(Freqmax_fft), type='text'),
 
 
                                         html.H6(id='paramsSTFT',
                                                 children=['STFT']),
 
                                         html.Label('win size (ns)'),
-                                        dcc.Input(id = 'params_stft_win', value='0.05', type='text'),
+                                        dcc.Input(id = 'params_stft_win', value=str(winsize), type='text'),
                                         html.Br(),
                                         html.Label('overlap (ns)'),
-                                        dcc.Input(id = 'params_stft_overlap', value='0.01', type='text'),
+                                        dcc.Input(id = 'params_stft_overlap', value=str(overlap), type='text'),
                                         html.Button(id='setbutton', n_clicks=0, children='Set Params')
 
                                 ])
@@ -221,9 +221,9 @@ app.layout = html.Div(
                                     dcc.Graph(id='map2', figure = fig1),
                         html.Br(),
                         html.Label('time (ns)'),
-                        dcc.Input(id = 'params_stft_time_2', value='1', type='text'),
+                        dcc.Input(id = 'params_stft_time_2', value=str(winsize_timemap), type='text'),
                         html.Label('win size (ns)'),
-                        dcc.Input(id = 'params_stft_win_2', value='0.05', type='text'),
+                        dcc.Input(id = 'params_stft_win_2', value=str(time_timemap), type='text'),
                         html.Button(id='set-button_timemap', n_clicks=0, children='Set Params'),
                         html.H4(children=['Signal informations']),
                         html.H6(id='info', children=[yaml.safe_dump(Df_datatxtfile[Current_point],default_flow_style=False)])
