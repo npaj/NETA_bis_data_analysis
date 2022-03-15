@@ -70,8 +70,8 @@ nfft = 2**14
 Freqmax_fft = 100
 
 #STFT
-winsize = 0.05
-overlap = 0.02
+winsize = 0.5
+overlap = 0.4
 
 #heamp2
 winsize_timemap = .05
