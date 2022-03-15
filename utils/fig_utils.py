@@ -23,6 +23,10 @@ def plot_heatmap_maxfrequency(X, Y, Z, title = 'None'):
                   yaxis={"title": 'y (mm)'},
                   xaxis={"title": 'x (mm)'},
                   )
+    fig.update_yaxes(
+            scaleanchor = "x",
+            scaleratio = 1,
+        )
     return fig
 
 def plot_signals(raw_signal, filterd_signal, psd, winsize = 0.2, overlapsize = 0.1, fmax = 100, x=0, y=0):
