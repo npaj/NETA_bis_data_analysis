@@ -64,6 +64,7 @@ Tmin = -0.2
 Tmax = 2
 Freqmin = 20
 Freqmax = 100
+threshold = 10
 
 #FFT
 nfft = 2**14
@@ -85,7 +86,7 @@ Current_point = 0
 
 Params = ['params_filt_type', 'params_filt_min', 
         'params_filt_max', 'params_filt_minfreq','params_filt_maxfreq',
-        'params_fft_nfft', 'params_fft_max','params_stft_win','params_stft_overlap', 'params_stft_cmin', 'params_stft_cmax', "params_stft_cmin_2", 'params_stft_cmax_2']
+        'params_fft_nfft', 'params_fft_max','params_stft_win','params_stft_overlap', 'params_stft_cmin', 'params_stft_cmax', "params_stft_cmin_2", 'params_stft_cmax_2', 'threshold']
 
 ##############
 # Process signals
@@ -105,9 +106,10 @@ FREQMAX_IDX = freq < Freqmax
 signal_filt = np.asarray([utils_filt.filt(signal[idx, 0, t<Tmax], signal[idx, 1, t<Tmax], 0, FiltType) for idx in tqdm(range(len(Df_data)))])
 PSD = np.array([np.abs(np.fft.fft(signal_filt[idx,1], n = nfft)) for idx in range(len(Df_data))])[:,FREQMAX_IDX]
 freq = freq[FREQMAX_IDX]
-
+PSD[np.max(PSD/np.mean(PSD), axis=1)<threshold, 0]=100
 PSDmaxIDX = np.argmax(PSD, axis=1)
 PSDmax = freq[PSDmaxIDX]
+
 
 
 fig1 = fig_utils.plot_heatmap_maxfrequency(np.cumsum(Df_data['dx']), np.cumsum(Df_data['dy']), PSDmax, clim = [cmin, cmax])
@@ -179,6 +181,9 @@ app.layout = html.Div(
                                         html.Br(),
                                         html.Label('Max freq (GHz)'),
                                         dcc.Input(id = 'params_filt_maxfreq', value=str(Freqmax), type='text'),
+                                        html.Br(),
+                                        html.Label('Threshold'),
+                                        dcc.Input(id = 'threshold', value=str(threshold), type='text'),
                                         ]),
                                         html.Div(
                                     className="one-third column omega",
@@ -238,6 +243,8 @@ app.layout = html.Div(
                         dcc.Input(id = 'params_stft_cmin_2', value=str(cmin_time), type='text'),
                         html.Label('zmax (GHz)'),
                         dcc.Input(id = 'params_stft_cmax_2', value=str(cmax_time), type='text'),
+                        html.Label('Threshold'),
+                        dcc.Input(id = 'threshold_2', value=str(threshold), type='text'),
                         html.Button(id='set-button_timemap', n_clicks=0, children='Set Params'),
                         html.H4(children=['Signal informations']),
                         html.H6(id='info', children=[yaml.safe_dump(Df_datatxtfile[Current_point],default_flow_style=False)])
@@ -276,9 +283,10 @@ def Update(n_clicks, filttype, *params):
     global cmax
     global cmax_time
     global cmin_time
+    global threshold
     FiltType = filttype
 
-    Tmin, Tmax, Freqmin, Freqmax, nfft, Freqmax_fft, winsize, overlap, cmin, cmax, cmin_time, cmax_time =  np.array(params, dtype=float)
+    Tmin, Tmax, Freqmin, Freqmax, nfft, Freqmax_fft, winsize, overlap, cmin, cmax, cmin_time, cmax_time,threshold =  np.array(params, dtype=float)
     nfft = int(2**nfft)
 
 
@@ -301,8 +309,10 @@ def Update(n_clicks, filttype, *params):
     print(PSD.shape)
     print('eeee')
     freq2 = freq[FREQMAX_IDX]
+    PSD[np.max(PSD/np.mean(PSD), axis=1)<threshold, 0]=100
     PSDmaxIDX = np.argmax(PSD, axis=1)
     PSDmax = freq2[PSDmaxIDX]
+    
 
 
 
@@ -364,10 +374,11 @@ def Update_map(clickData):
 
 @app.callback(Output('map2', 'figure'),
                 [Input('set-button_timemap', 'n_clicks')],
-                [State('params_stft_time_2', 'value'),State('params_stft_win_2', 'value'), State('params_stft_cmin_2', 'value'), State('params_stft_cmax_2', 'value')]
+                [State('params_stft_time_2', 'value'),State('params_stft_win_2', 'value'), State('params_stft_cmin_2', 'value'), State('params_stft_cmax_2', 'value'), State('threshold_2', 'value')]
                 )
-def Update_map(click,current_time, winsize, cmin2, cmax2):
+def Update_map(click,current_time, winsize, cmin2, cmax2, th):
     global signal_filt
+    global threshold
     print(cmin2, cmax2)
     current_time = float(current_time)
     winsize = float(winsize)
@@ -380,13 +391,17 @@ def Update_map(click,current_time, winsize, cmin2, cmax2):
         freq = (np.arange(nfft)*FS/nfft)
         X = np.abs(np.fft.fft(x*sig.windows.hann(len(x), False), nfft))[freq < Freqmax]
         freq = freq[freq < Freqmax]
+        if np.max(X)/np.mean(X)<float(th):
+            X[0] = 100
         PSDmaxIDX = np.argmax(X)
+        
         PSDMAX[idx] = freq[PSDmaxIDX]
+        
     
     return(fig_utils.plot_heatmap_maxfrequency(np.cumsum(Df_data['dx']), np.cumsum(Df_data['dy']), PSDMAX, title = f'Max frequency at a given at {current_time:.3f} ns with {winsize:.3f} ns window size', clim = (float(cmin2), float(cmax2))))
 
 
 
 if __name__ == '__main__':
-    app.run_server(debug=False)#, host='127.0.0.1',port=os.getenv("PORT", "8051"))
-    # app.run_server(debug=True)#, host='127.0.0.1',port=os.getenv("PORT", "8051"))
+    # app.run_server(debug=False)#, host='127.0.0.1',port=os.getenv("PORT", "8051"))
+    app.run_server(debug=True)#, host='127.0.0.1',port=os.getenv("PORT", "8051"))

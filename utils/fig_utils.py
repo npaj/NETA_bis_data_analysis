@@ -77,7 +77,7 @@ def plot_signals(raw_signal, filterd_signal, psd, winsize = 0.2, overlapsize = 0
 
     fig.add_trace(go.Scatter(x = raw_signal[0,:], y=raw_signal[1,:], line_color = 'black'), row = 1, col=1)
     fig.add_trace(go.Scatter(x = filterd_signal[0], y=filterd_signal[1],line_color = 'black'), row = 2, col=1)
-    fig.add_trace(go.Scatter(y = psd[0], x= psd[1]/psd[0].max(),line_color = 'black'), row = 1, col=2)
+    fig.add_trace(go.Scatter(y = psd[0], x= psd[1]/np.mean(psd[1]),line_color = 'black'), row = 1, col=2)
     fig.add_trace(go.Heatmap(x = t, y=f, z = np.abs(Zxx) / np.abs(Zxx).max()), row = 3, col=1)
 
     # Update xaxis properties
