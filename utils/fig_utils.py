@@ -17,8 +17,8 @@ plt.rc('legend', fontsize=14)
 
 iii = 0
 savepdf = False
-def plot_heatmap_maxfrequency(X, Y, Z, title = 'None'):
-    fig = go.Figure(go.Heatmap(x = X, y = Y, z = Z,colorbar={"title": "Frequency (GHz)"}, colorscale='Jet'))
+def plot_heatmap_maxfrequency(X, Y, Z, clim = (None, None),  title = 'None'):
+    fig = go.Figure(go.Heatmap(x = X, y = Y, z = Z,colorbar={"title": "Frequency (GHz)"}, colorscale='Jet', zmin = clim[0], zmax = clim[1]))
     fig.update_layout(title=title,
                   yaxis={"title": 'y (mm)'},
                   xaxis={"title": 'x (mm)'},

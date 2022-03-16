@@ -72,16 +72,20 @@ Freqmax_fft = 100
 #STFT
 winsize = 0.5
 overlap = 0.4
+cmin = Freqmin
+cmax = Freqmax
 
 #heamp2
 winsize_timemap = .05
 time_timemap = 1
+cmin_time = cmin
+cmax_time = cmax
 
 Current_point = 0
 
 Params = ['params_filt_type', 'params_filt_min', 
         'params_filt_max', 'params_filt_minfreq','params_filt_maxfreq',
-        'params_fft_nfft', 'params_fft_max','params_stft_win','params_stft_overlap']
+        'params_fft_nfft', 'params_fft_max','params_stft_win','params_stft_overlap', 'params_stft_cmin', 'params_stft_cmax', "params_stft_cmin_2", 'params_stft_cmax_2']
 
 ##############
 # Process signals
@@ -106,7 +110,7 @@ PSDmaxIDX = np.argmax(PSD, axis=1)
 PSDmax = freq[PSDmaxIDX]
 
 
-fig1 = fig_utils.plot_heatmap_maxfrequency(np.cumsum(Df_data['dx']), np.cumsum(Df_data['dy']), PSDmax)
+fig1 = fig_utils.plot_heatmap_maxfrequency(np.cumsum(Df_data['dx']), np.cumsum(Df_data['dy']), PSDmax, clim = [cmin, cmax])
 fig2 = fig_utils.plot_signals(signal[Current_point,...],signal_filt[Current_point,:], (freq, PSD[Current_point,:]))
 
 ##############
@@ -197,6 +201,12 @@ app.layout = html.Div(
                                         html.Br(),
                                         html.Label('overlap (ns)'),
                                         dcc.Input(id = 'params_stft_overlap', value=str(overlap), type='text'),
+                                        html.Br(),
+                                        html.Label('zmin (GHz)'),
+                                        dcc.Input(id = 'params_stft_cmin', value=str(cmin), type='text'),
+                                        html.Br(),
+                                        html.Label('zmax (GHz)'),
+                                        dcc.Input(id = 'params_stft_cmax', value=str(cmax), type='text'),
                                         html.Button(id='setbutton', n_clicks=0, children='Set Params')
 
                                 ])
@@ -224,6 +234,10 @@ app.layout = html.Div(
                         dcc.Input(id = 'params_stft_time_2', value=str(winsize_timemap), type='text'),
                         html.Label('win size (ns)'),
                         dcc.Input(id = 'params_stft_win_2', value=str(time_timemap), type='text'),
+                        html.Label('zmin (GHz)'),
+                        dcc.Input(id = 'params_stft_cmin_2', value=str(cmin_time), type='text'),
+                        html.Label('zmax (GHz)'),
+                        dcc.Input(id = 'params_stft_cmax_2', value=str(cmax_time), type='text'),
                         html.Button(id='set-button_timemap', n_clicks=0, children='Set Params'),
                         html.H4(children=['Signal informations']),
                         html.H6(id='info', children=[yaml.safe_dump(Df_datatxtfile[Current_point],default_flow_style=False)])
@@ -258,9 +272,13 @@ def Update(n_clicks, filttype, *params):
     #STFT
     global winsize
     global overlap
+    global cmin
+    global cmax
+    global cmax_time
+    global cmin_time
     FiltType = filttype
 
-    Tmin, Tmax, Freqmin, Freqmax, nfft, Freqmax_fft, winsize, overlap =  np.array(params, dtype=float)
+    Tmin, Tmax, Freqmin, Freqmax, nfft, Freqmax_fft, winsize, overlap, cmin, cmax, cmin_time, cmax_time =  np.array(params, dtype=float)
     nfft = int(2**nfft)
 
 
@@ -283,16 +301,12 @@ def Update(n_clicks, filttype, *params):
     print(PSD.shape)
     print('eeee')
     freq2 = freq[FREQMAX_IDX]
-    
-
-
     PSDmaxIDX = np.argmax(PSD, axis=1)
-
     PSDmax = freq2[PSDmaxIDX]
 
 
 
-    fig1 = fig_utils.plot_heatmap_maxfrequency(np.cumsum(Df_data['dx']), np.cumsum(Df_data['dy']), PSDmax, title='Max frequency')
+    fig1 = fig_utils.plot_heatmap_maxfrequency(np.cumsum(Df_data['dx']), np.cumsum(Df_data['dy']), PSDmax, title='Max frequency', clim=(cmin, cmax))
     # fig2 = fig_utils.plot_signals(signal[Current_point,...],signal_filt[Current_point,:], (freq, PSD[Current_point,:]), winsize=winsize, overlapsize=overlap,fmax = Freqmax_fft)
 
 
@@ -350,10 +364,11 @@ def Update_map(clickData):
 
 @app.callback(Output('map2', 'figure'),
                 [Input('set-button_timemap', 'n_clicks')],
-                [State('params_stft_time_2', 'value'),State('params_stft_win_2', 'value')]
+                [State('params_stft_time_2', 'value'),State('params_stft_win_2', 'value'), State('params_stft_cmin_2', 'value'), State('params_stft_cmax_2', 'value')]
                 )
-def Update_map(click,current_time, winsize):
+def Update_map(click,current_time, winsize, cmin2, cmax2):
     global signal_filt
+    print(cmin2, cmax2)
     current_time = float(current_time)
     winsize = float(winsize)
     PSDMAX = np.zeros(len(Df_data))
@@ -368,9 +383,10 @@ def Update_map(click,current_time, winsize):
         PSDmaxIDX = np.argmax(X)
         PSDMAX[idx] = freq[PSDmaxIDX]
     
-    return(fig_utils.plot_heatmap_maxfrequency(np.cumsum(Df_data['dx']), np.cumsum(Df_data['dy']), PSDMAX, title = f'Max frequency at a given at {current_time:.3f} ns with {winsize:.3f} ns window size'))
+    return(fig_utils.plot_heatmap_maxfrequency(np.cumsum(Df_data['dx']), np.cumsum(Df_data['dy']), PSDMAX, title = f'Max frequency at a given at {current_time:.3f} ns with {winsize:.3f} ns window size', clim = (float(cmin2), float(cmax2))))
 
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)#, host='127.0.0.1',port=os.getenv("PORT", "8051"))
+    app.run_server(debug=False)#, host='127.0.0.1',port=os.getenv("PORT", "8051"))
+    # app.run_server(debug=True)#, host='127.0.0.1',port=os.getenv("PORT", "8051"))
