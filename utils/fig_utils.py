@@ -23,11 +23,11 @@ def plot_heatmap_maxfrequency(X, Y, Z, clim = (None, None),  title = 'None'):
     if iii > 2 and savepdf:
         nn = int(np.sqrt(Z.shape[0]))
         plt.figure()
-        plt.figure(figsize=(4,3))
+        plt.figure(figsize=(6,5))
         plt.imshow(Z.reshape(nn,nn), extent=[X.min(), X.max(), Y.min(), Y.max()], cmap='jet', vmin=clim[0],vmax=clim[1])
         plt.xlabel('x (mm)')
         plt.ylabel('y (mm)')
-        plt.title(title, fontsize=8)
+        plt.title(title, fontsize=12)
         plt.colorbar(label='Max Frequency (GHz)')
         plt.tight_layout()
         plt.savefig('MAP.png', transparent = True, dpi = 800)
