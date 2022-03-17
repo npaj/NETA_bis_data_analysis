@@ -16,7 +16,7 @@ def filt(time, signal, zerosplus = 0, Type = 'BPF', Freqmin = 20, Freqmax=100):
         def f(t,a,b,c,d,e,t0):
             return(a*np.exp(-b*(t-t0))+c+d*np.exp(-e*t-t0))
         data,cov = curve_fit(f,time,amp)     
-        return np.array(time, amp-f(time,*data))
+        return (time, amp-f(time,*data)
 
 
     
@@ -28,4 +28,4 @@ def filt(time, signal, zerosplus = 0, Type = 'BPF', Freqmin = 20, Freqmax=100):
     if Type == 'Poly':
         poly = np.polyfit(time,amp,10)
         fonc = np.poly1d(poly)
-        return np.array(time,amp-fonc(time))
+        return (time,amp-fonc(time))
