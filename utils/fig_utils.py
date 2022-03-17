@@ -19,6 +19,7 @@ plt.rc('legend', fontsize=14)
 iii = 0
 savepdf = True
 def plot_heatmap_maxfrequency(X, Y, Z, clim = (None, None),  title = 'None'):
+    global iii
     if iii > 2 and savepdf:
         nn = int(np.sqrt(Z.shape[0]))
         plt.figure()
