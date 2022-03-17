@@ -390,7 +390,7 @@ def Update_map(click,current_time, winsize, cmin2, cmax2, th):
         t = signal_filt[idx, 0][IDX_TIME]
         freq = (np.arange(nfft)*FS/nfft)
         X = np.abs(np.fft.fft(x*sig.windows.hann(len(x), False), nfft))[np.logical_and(freq> cmin2, freq < cmax2)]
-        freq = freq[np.logical_and(freq> cmin2, freq < cmax2)]
+        freq = freq[np.logical_and(freq> float(cmin2), freq < float(cmax2))]
         if np.max(X)/np.mean(X)<float(th):
             X[0] = 100
         PSDmaxIDX = np.argmax(X)

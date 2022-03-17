@@ -40,7 +40,7 @@ def plot_heatmap_maxfrequency(X, Y, Z, clim = (None, None),  title = 'None'):
         )
     fig.update_layout(title=title,
                   yaxis={"title": 'y (mm)'},
-                  xaxis={"title": 'x (mm)'},width = 500, height = 400,
+                  xaxis={"title": 'x (mm)'},width = 700, height = 600,
                   )
     return fig
 
