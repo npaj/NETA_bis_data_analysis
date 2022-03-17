@@ -364,7 +364,7 @@ def Update_map(clickData):
 
     dt = abs(t[10]-t[11])
     freq =np.arange(nfft)/dt/nfft
-    FREQMAX_IDX = freq < Freqmax
+    FREQMAX_IDX = np.logical_and(freq < Freqmax, freq > Freqmin)
 
     signal_filt = utils_filt.filt(signal[ 0, np.logical_and(t>Tmin, t<Tmax)], signal[1,np.logical_and(t>Tmin, t<Tmax)], 0, FiltType, Freqmin, Freqmax) 
     PSD = np.abs(np.fft.fft(signal_filt[1], n = nfft))[FREQMAX_IDX]
@@ -389,8 +389,8 @@ def Update_map(click,current_time, winsize, cmin2, cmax2, th):
         x = signal_filt[idx, 1][IDX_TIME]
         t = signal_filt[idx, 0][IDX_TIME]
         freq = (np.arange(nfft)*FS/nfft)
-        X = np.abs(np.fft.fft(x*sig.windows.hann(len(x), False), nfft))[freq < Freqmax]
-        freq = freq[freq < Freqmax]
+        X = np.abs(np.fft.fft(x*sig.windows.hann(len(x), False), nfft))[np.logical_and(freq> Freqmin, freq < Freqmax)]
+        freq = freq[np.logical_and(freq> Freqmin, freq < Freqmax)]
         if np.max(X)/np.mean(X)<float(th):
             X[0] = 100
         PSDmaxIDX = np.argmax(X)
