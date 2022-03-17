@@ -303,7 +303,7 @@ def Update(n_clicks, filttype, *params):
     freq =np.arange(nfft)/dt/nfft
     FREQMAX_IDX = np.logical_and(freq < Freqmax, freq > Freqmin)
 
-    signal_filt = np.asarray([utils_filt.filt(signal[idx, 0, np.logical_and(t>Tmin, t<Tmax)], signal[idx, 1, np.logical_and(t>Tmin, t<Tmax)], Type =FiltType, Freqmin=Freqmin, Freqmax = Freqmax) for idx in tqdm(range(len(Df_data)))])
+    signal_filt = np.array([utils_filt.filt(signal[idx, 0, np.logical_and(t>Tmin, t<Tmax)], signal[idx, 1, np.logical_and(t>Tmin, t<Tmax)], Type =FiltType, Freqmin=Freqmin, Freqmax = Freqmax) for idx in tqdm(range(len(Df_data)))])
     # print(signal_filt.shape)
     PSD = np.array([np.abs(np.fft.fft(signal_filt[idx,1], n = nfft)) for idx in range(len(Df_data))])[:,FREQMAX_IDX]
     print(PSD.shape)
