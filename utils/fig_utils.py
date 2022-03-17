@@ -26,7 +26,7 @@ def plot_heatmap_maxfrequency(X, Y, Z, clim = (None, None),  title = 'None'):
         plt.imshow(Z.reshape(nn,nn), extent=[X.min(), X.max(), Y.min(), Y.max()], cmap='jet', vmin=clim[0],vmax=clim[1])
         plt.xlabel('x (mm)')
         plt.ylabel('y (mm)')
-        plt.title(title)
+        plt.title(title, fontsize=8)
         plt.colorbar(label='Max Frequency (GHz)')
         plt.tight_layout()
         plt.savefig('MAP.png', transparent = True, dpi = 800)
@@ -42,6 +42,7 @@ def plot_heatmap_maxfrequency(X, Y, Z, clim = (None, None),  title = 'None'):
                   yaxis={"title": 'y (mm)'},
                   xaxis={"title": 'x (mm)'},width = 700, height = 600,
                   )
+    iii +=1
     return fig
 
 def plot_signals(raw_signal, filterd_signal, psd, winsize = 0.2, overlapsize = 0.1, fmax = 100, x=0, y=0):
@@ -54,7 +55,7 @@ def plot_signals(raw_signal, filterd_signal, psd, winsize = 0.2, overlapsize = 0
         gs_kw = dict(width_ratios=[2.6, 1], height_ratios=[2, 1])
         fig_, axd = plt.subplot_mosaic([['upper left', 'right'],
                                     ['lower left', 'right']],
-                                    gridspec_kw=gs_kw, figsize=(8.5, 3.5),
+                                    gridspec_kw=gs_kw, figsize=(8.5, 5),
                                     constrained_layout=True)
 
             
@@ -73,7 +74,7 @@ def plot_signals(raw_signal, filterd_signal, psd, winsize = 0.2, overlapsize = 0
         axd['right'].set_ylim(0, 100)
         axd['right'].set_xlabel("Norm. amplitude (-)")
         axd['right'].set_ylabel("Frequency (GHz)")
-        plt.suptitle('Raw signal at point (x,y) = ({x:.3f},{y:.3f})mm')
+        plt.suptitle(f'Raw signal at point (x,y) = ({x:.3f},{y:.3f})mm', fontsize=10)
         plt.tight_layout()
         plt.savefig('OneSignal.pdf')
         plt.close('all')
