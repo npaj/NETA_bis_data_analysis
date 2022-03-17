@@ -309,7 +309,7 @@ def Update(n_clicks, filttype, *params):
     print(PSD.shape)
     print('eeee')
     freq2 = freq[FREQMAX_IDX]
-    # PSD[np.max(PSD/np.mean(PSD), axis=1)<threshold, 0]=100
+    PSD[np.max(PSD/np.mean(PSD), axis=1)<threshold, 0]=100
     PSDmaxIDX = np.argmax(PSD, axis=1)
     PSDmax = freq2[PSDmaxIDX]
     
@@ -391,8 +391,8 @@ def Update_map(click,current_time, winsize, cmin2, cmax2, th):
         freq = (np.arange(nfft)*FS/nfft)
         X = np.abs(np.fft.fft(x*sig.windows.hann(len(x), False), nfft))[np.logical_and(freq> Freqmin, freq < Freqmax)]
         freq = freq[np.logical_and(freq> Freqmin, freq < Freqmax)]
-        # if np.max(X)/np.mean(X)<float(th):
-        #     X[0] = 100
+        if np.max(X)/np.mean(X)<float(th):
+            X[0] = 100
         PSDmaxIDX = np.argmax(X)
         
         PSDMAX[idx] = freq[PSDmaxIDX]
