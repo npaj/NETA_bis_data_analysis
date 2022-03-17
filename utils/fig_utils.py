@@ -1,3 +1,4 @@
+from turtle import width
 import numpy as np
 import pandas as pd
 from scipy import signal as sig
@@ -16,17 +17,31 @@ plt.rc('axes', linewidth=1, labelsize=14)
 plt.rc('legend', fontsize=14)
 
 iii = 0
-savepdf = False
+savepdf = True
 def plot_heatmap_maxfrequency(X, Y, Z, clim = (None, None),  title = 'None'):
+    if iii > 2 and savepdf:
+        nn = int(np.sqrt(Z.shape[0]))
+        plt.figure()
+        plt.figure(figsize=(4,3))
+        plt.imshow(Z.reshape(nn,nn), extent=[X.min(), X.max(), Y.min(), Y.max()], cmap='jet', vmin=clim[0],vmax=clim[1])
+        plt.xlabel('x (mm)')
+        plt.ylabel('y (mm)')
+        plt.title(title)
+        plt.colorbar(label='Max Frequency (GHz)')
+        plt.tight_layout()
+        plt.savefig('MAP.png', transparent = True, dpi = 800)
+
+
     fig = go.Figure(go.Heatmap(x = X, y = Y, z = Z,colorbar={"title": "Frequency (GHz)"}, colorscale='Jet', zmin = clim[0], zmax = clim[1]))
-    fig.update_layout(title=title,
-                  yaxis={"title": 'y (mm)'},
-                  xaxis={"title": 'x (mm)'},
-                  )
+
     fig.update_yaxes(
             scaleanchor = "x",
             scaleratio = 1,
         )
+    fig.update_layout(title=title,
+                  yaxis={"title": 'y (mm)'},
+                  xaxis={"title": 'x (mm)'},width = 500, height = 400,
+                  )
     return fig
 
 def plot_signals(raw_signal, filterd_signal, psd, winsize = 0.2, overlapsize = 0.1, fmax = 100, x=0, y=0):
@@ -58,8 +73,9 @@ def plot_signals(raw_signal, filterd_signal, psd, winsize = 0.2, overlapsize = 0
         axd['right'].set_ylim(0, 100)
         axd['right'].set_xlabel("Norm. amplitude (-)")
         axd['right'].set_ylabel("Frequency (GHz)")
+        plt.suptitle('Raw signal at point (x,y) = ({x:.3f},{y:.3f})mm')
         plt.tight_layout()
-        plt.savefig('test2.pdf')
+        plt.savefig('OneSignal.pdf')
         plt.close('all')
         print('done')
 
